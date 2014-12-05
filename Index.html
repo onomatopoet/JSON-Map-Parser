@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lab8a</title>
+  <script src="https://maps.googleapis.com/maps/api/js?libraries=visualization">
+  </script>
+
+  <script>
+    var map;
+    var markers = [];
+    var checkList = [];
+    var arrHits = [[]];
+    var Asia = ["Afghanistan", "Bahrain", "Bangladesh", "Bhutan", "Brunei", "Burma (Myanmar)", "Cambodia", "China", "East Timor", "Hong Kong",
+                  "India", "Indonesia", "Iran, Islamic Republic of", "Iraq", "Israel", "Japan", "Jordan", "Kazakhstan", "Korea, North",
+                  "Korea, Republic of", "Korea, South", "Kuwait", "Kyrgyzstan","Laos", "Lebanon", "Malaysia", "Maldives", "Mongolia", "Nepal",
+                  "Oman", "Pakistan", "Philippines", "Qatar", "Russian Federation", "Saudi Arabia", "Singapore", "Sri Lanka", "Syria", "Taiwan",
+                  "Tajikistan", "Thailand", "Turkey", "Turkmenistan", "United Arab Emirates", "Uzbekistan", "Vietnam",
+                  "Yemen"];
+    var Africa = ["Algeria", "Angola", "Benin", "Botswana", "Burkina", "Burundi", "Cameroon", "Cape Verde", "Central African Republic", "Chad", "Comoros",
+                  "Congo", "Congo, Democratic Republic of", "Djibouti", "Egypt", "Equatorial Guinea", "Eritrea", "Ethiopia", "Gabon", "Gambia", "Ghana",
+                  "Guinea", "Guinea-Bissau", "Ivory Coast", "Kenya", "Lesotho", "Liberia", "Libya", "Madagascar", "Malawi", "Mali", "Mauritania", "Mauritius",
+                  "Morocco", "Mozambique", "Namibia", "Niger", "Nigeria", "Rwanda", "Sao Tome and Principe", "Senegal", "Seychelles", "Sierra Leone",
+                  "Somalia", "South Africa", "South Sudan", "Sudan", "Swaziland", "Tanzania, United Republic of", "Togo", "Tunisia", "Uganda", "Zambia",
+                  "Zimbabwe", "Anonymous Proxy"];
+    var Europe = ["Albania", "Andorra", "Armenia", "Austria", "Azerbaijan", "Belarus", "Belgium", "Bosnia and Herzegovina", "Bulgaria", "Croatia", "Cyprus",
+                  "Czech Republic", "Denmark", "Estonia", "Finland", "France", "Georgia", "Germany", "Greece", "Hungary", "Iceland", "Ireland", "Italy",
+                  "Latvia", "Liechtenstein", "Lithuania", "Luxembourg", "Macedonia", "Malta", "Moldova, Republic of", "Monaco", "Montenegro", "Netherlands",
+                  "Norway", "Poland", "Portugal", "Romania", "San Marino", "Serbia", "Slovakia", "Slovenia", "Spain", "Sweden", "Switzerland", "Ukraine",
+                  "United Kingdom", "Vatican City"];
+    var NorthAmerica = ["Antigua and Barbuda", "Bahamas", "Barbados", "Belize", "Canada", "Costa Rica", "Cuba", "Dominica", "Dominican Republic",
+                  "El Salvador", "Grenada", "Guatemala", "Haiti", "Honduras", "Jamaica", "Mexico", "Nicaragua", "Panama", "Saint Kitts and Nevis",
+                  "Saint Lucia", "Saint Vincent and the Grenadines", "Trinidad and Tobago", "United States", 
+                  "Puerto Rico"];
+    var Oceania = ["Australia", "Fiji", "Kiribati", "Marshall Islands", "Micronesia", "Nauru", "New Zealand", "Palau", "Papua New Guinea", "Samoa",
+                  "Solomon Islands", "Tonga", "Tuvalu", "Vanuatu"];
+    var SouthAmerica = ["Argentina", "Bolivia", "Brazil", "Chile", "Colombia", "Ecuador", "Guyana", "Paraguay", "Peru", "Suriname", "Uruguay", "Venezuela"];
+    
+     // Initializes the map then accesses data
+    function initialize() {
+      map = new google.maps.Map(document.getElementById('map_canvas'), {
+        zoom: 2.99999,
+        center: new google.maps.LatLng(72, -82),
+        mapTypeId: google.maps.MapTypeId.TERRAIN
+      });
+      // Retrieves data from the json file and adds each row to row[array]
+      var xmlhttp;
+      if (window.XMLHttpRequest) {
+        // code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlhttp = new XMLHttpRequest();
+      } else {
+        // code for IE6, IE5
+        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+      }
+      // Pull data from JSON file
+      xmlhttp.open("GET","http://jeremy.yosemite.edu/~dkp/ipvisits.json",false);
+      xmlhttp.send();
+      // Put JSON data into arrays
+      row = xmlhttp.responseText.toString().split("\n");
+      for (var i = 0; i < row.length; i++) {
+        currentRow = JSON.parse(row[i]);
+        var arrayZ = [];
+        arrayZ[0] = currentRow.ip;
+        arrayZ[1] = currentRow.country_name;
+        arrayZ[2] = currentRow.longitude;
+        arrayZ[3] = currentRow.latitude;
+        arrHits.push(arrayZ);
+      }
+    }
+    
+    // Iterates through each country of the requested continent
+    function loadContinent(continent) {
+      continent.forEach(loadCountry);
+    }
+    
+    // Gets Markers for IP addresses based on Country Name
+    function loadCountry(CountryName){
+      for (var x = 0; x < row.length; x++) {
+        if (arrHits[x][1] === CountryName.toString() || CountryName.toString() === 'ALL') {
+          var latLng = new google.maps.LatLng(arrHits[x][3],arrHits[x][2]);
+          var marker = new google.maps.Marker({
+            position: latLng,
+            map: map,
+            title: arrHits[x][0]
+          });
+          markers.push(marker);
+        }
+      }
+    }
+    
+    // User input from text field is formatted and sent to loadCountry()
+    function userValue() {
+      var input = document.getElementById("txtInput").value;
+      input = input.charAt(0).toUpperCase() + input.substr(1).toLowerCase();
+      if (input === "Usa") {
+        input = "United States";
+      } else if (input === "Us") {
+        input = "United States";
+      } else if (input === "America") {
+        input = "United States";
+      } else if (input === "Korea") {
+        input = "Korea, Republic of";
+      } else if (input === "Hong kong") {
+        input = "Hong Kong";
+      } else if (input === "Russia") {
+        input = "Russian Federation";
+      } else if (input === "Trinidad") {
+        input = "Trinidad and Tobago";
+      } else if (input === "Tanzania") {
+        input = "Tanzania, United Republic of";
+      } else if (input === "Czechoslovakia") {
+        input = "Czech Republic";
+      } else if (input === "Puerto rico") {
+        input = "Puerto Rico";
+      } else if (input === "Britain") {
+        input = "United Kingdom";
+      } else if (input === "Great britain") {
+        input = "United Kingdom";
+      } else if (input === "England") {
+        input = "United Kingdom";
+      } else if (input === "Moldova") {
+        input = "Moldova, Republic of";
+      } else if (input === "Iran") {
+        input = "Iran, Islamic Republic of";
+      } else {
+        input = input;
+      }
+      loadCountry(input);
+      document.getElementById("txtInput").select();
+    }
+    
+    // Deletes all of the markers and removes them from the map
+    function deleteMarkers() {
+      for (var d = 0; d < markers.length; d++) {
+        markers[d].setMap(null);
+      }
+      markers = [];
+    }
+    
+    google.maps.event.addDomListener(window, 'load', initialize);
+  </script>
+  
+</head>
+<body>
+  <table style="position: relative;z-index: 1;top: 0;padding: 0;margin: 0px auto 0;text-align: center; border-collapse:collapse; background-color: #c0c0c0" >
+    <tr>
+      <td style="border:2px solid black;">
+        &nbsp;&nbsp;
+          <button type="button" onclick="loadCountry('ALL')">Show All</button>
+          <button type="button" onclick="deleteMarkers()">Delete All</button>
+        &nbsp;&nbsp;||&nbsp;&nbsp;
+          <button type="button" onclick="loadCountry('China')">China</button>
+          <button type="button" onclick="loadCountry('Russian Federation')">Russia</button>
+          <button type="button" onclick="loadCountry('United States')">USA</button>
+        &nbsp;&nbsp;||&nbsp;&nbsp;
+          <button type="button" onclick="loadContinent(Africa)">Africa</button>
+          <button type="button" onclick="loadContinent(Asia)">Asia</button>
+          <button type="button" onclick="loadContinent(Europe)">Europe</button>
+          <button type="button" onclick="loadContinent(NorthAmerica)">North America</button>
+          <button type="button" onclick="loadContinent(Oceania)">Oceania</button>
+          <button type="button" onclick="loadContinent(SouthAmerica)">South America</button>
+        &nbsp;&nbsp;||&nbsp;&nbsp;
+          By Country Name: <input type="text" name="txtInput" id="txtInput" onkeydown="if (event.keyCode == 13) userValue()"/>
+          <button type="button" onclick="userValue()">Show</button>
+        &nbsp;&nbsp;
+      </td>
+    </tr>
+  </table>
+  <div id="map_canvas" style="height: 100%;width: 100%;position:absolute;top: 0;left: 0;z-index: 0;opacity: .75;margin: 0;padding: 0;">
+  </div>
+</body>
+</html>
